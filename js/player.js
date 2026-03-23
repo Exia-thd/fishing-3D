@@ -31,6 +31,14 @@ class Player {
         this._prevF = false;
         this.isLocked = false;
 
+        // Player flashlight
+        this.flashlight = new THREE.SpotLight(0xfff4cc, 3.5, 45, Math.PI / 8, 0.35, 1.4);
+        this.flashlight.castShadow = false;
+        this._flashTarget = new THREE.Object3D();
+        scene.add(this.flashlight);
+        scene.add(this._flashTarget);
+        this.flashlight.target = this._flashTarget;
+
         this._setupInput();
         this._updateCamera();
     }
@@ -146,6 +154,15 @@ class Player {
         this.camera.rotation.order = 'YXZ';
         this.camera.rotation.y = this.yaw;
         this.camera.rotation.x = this.pitch;
+
+        // Sync flashlight to camera look direction
+        this.flashlight.position.copy(this.camera.position);
+        const fwd = new THREE.Vector3(
+            -Math.sin(this.yaw) * Math.cos(this.pitch),
+            Math.sin(this.pitch),
+            -Math.cos(this.yaw) * Math.cos(this.pitch)
+        );
+        this._flashTarget.position.copy(this.camera.position).addScaledVector(fwd, 15);
     }
 
     // World-space eye position
