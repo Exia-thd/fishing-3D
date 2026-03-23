@@ -51,16 +51,16 @@ class World {
         this.scene.add(moon);
 
         // Moon glow (point light)
-        const moonGlow = new THREE.PointLight(0xaabbdd, 0.4, 600);
+        const moonGlow = new THREE.PointLight(0xaabbdd, 1.0, 600);
         moonGlow.position.copy(moon.position);
         this.scene.add(moonGlow);
     }
 
     // ── Lighting ─────────────────────────────────────────────────────────────
     _lighting() {
-        this.scene.add(new THREE.AmbientLight(0x0d1a28, 0.55));
+        this.scene.add(new THREE.AmbientLight(0x1a2e44, 1.1));
 
-        const dir = new THREE.DirectionalLight(0x7799cc, 0.35);
+        const dir = new THREE.DirectionalLight(0x99bbdd, 0.75);
         dir.position.set(-2, 4, -3);
         dir.castShadow = true;
         dir.shadow.mapSize.set(1024, 1024);
