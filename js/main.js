@@ -122,7 +122,7 @@ const Game = {
         UI.updateFishCount();
 
         setTimeout(() => document.body.requestPointerLock(), 150);
-        UI.showMessage('🌙 Đêm bắt đầu! Câu cá và đừng để bị bắt!', 3, '#aaffaa');
+        UI.showMessage(Lang.t('night_start'), 3, '#aaffaa');
     },
 
     endNight() {
@@ -147,7 +147,7 @@ const Game = {
         const fine = moneyBefore - GameState.money;
 
         document.getElementById('caught-fine-msg').textContent =
-            `Mất ${fishLost} cá + phạt ${fine}g tiền mặt!`;
+            Lang.t('caught_fine', { fish: fishLost, fine });
 
         setTimeout(() => {
             UI.updateMoney();

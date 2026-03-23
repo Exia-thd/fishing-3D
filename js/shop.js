@@ -10,7 +10,7 @@ const Shop = {
 
     buy(id, cost) {
         if (GameState.money < cost) {
-            UI.showMessage('Không đủ tiền!', 2, '#ff4444');
+            UI.showMessage(Lang.t('not_enough_money'), 2, '#ff4444');
             return;
         }
         GameState.spendMoney(cost);
@@ -28,7 +28,7 @@ const Shop = {
                 if (!GameState.extras.includes(id)) GameState.extras.push(id);
         }
 
-        UI.showMessage(`Đã mua!`, 2, '#00ff00');
+        UI.showMessage(Lang.t('item_bought'), 2, '#00ff00');
         UI.buildShop();  // re-render
     }
 };

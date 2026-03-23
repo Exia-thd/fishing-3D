@@ -3,107 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cá Trộm: Đêm Không Ngủ</title>
+    <title>Cá Trộm: Đêm Không Ngủ / Fish Thief: Sleepless Night</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Vignette & effects -->
+    <!-- Overlay effects -->
     <div id="vignette"></div>
     <div id="flash-overlay"></div>
 
+    <!-- Language toggle (always visible) -->
+    <button id="btn-lang" onclick="Lang.toggle()" style="
+        position:fixed; top:12px; right:14px; z-index:200;
+        padding:6px 14px; font-size:12px; margin:0; letter-spacing:1px;
+        border-color:rgba(0,255,0,0.5); color:rgba(0,255,0,0.8);">EN</button>
+
     <!-- HUD -->
     <div id="hud">
-        <div class="hud-item" id="money-display">💰 <span id="money">500</span>g</div>
-        <div class="hud-item" id="fish-display">🐟 <span id="fish-caught">0</span> cá</div>
-        <div class="hud-item" id="night-indicator">🌙 ĐÊM</div>
+        <div class="hud-item">💰 <span id="money">500</span>g</div>
+        <div class="hud-item">🐟 <span id="fish-caught">0</span></div>
+        <div class="hud-item" data-lang="hud_night">🌙 ĐÊM</div>
     </div>
 
     <!-- Radar + Alert (bottom right) -->
     <div id="radar-container">
         <canvas id="radar" width="200" height="200"></canvas>
         <div id="alert-info">
-            <span id="reel-tension-label">REEL TENSION</span>
+            <span id="reel-tension-label" data-lang="reel_tension">CĂNG DÂY</span>
             <div id="reel-bar-wrap"><div id="reel-bar"></div></div>
             <div id="alert-bottom">
                 <span id="alert-percent">0%</span>
-                <span id="alert-label">ALERT</span>
+                <span id="alert-label" data-lang="alert_label">CẢNH BÁO</span>
             </div>
         </div>
     </div>
 
     <!-- Tension bar (center, fishing) -->
     <div id="tension-ui" class="hidden">
-        <div class="ui-label">CĂNG DÂY</div>
+        <div class="ui-label" data-lang="tension_label">CĂNG DÂY</div>
         <div id="tension-bar-wrap">
             <div id="tension-safe-zone"></div>
             <div id="tension-indicator"></div>
         </div>
-        <div class="ui-hint">Giữ [SPACE] để kéo · Thả ra để nghỉ</div>
+        <div class="ui-hint" data-lang="tension_hint">Giữ [SPACE] để kéo · Thả ra để nghỉ</div>
         <div id="reel-progress-wrap"><div id="reel-progress-bar"></div></div>
     </div>
 
     <!-- Cast power (center-top, charging) -->
     <div id="cast-ui" class="hidden">
-        <div class="ui-label">LỰC QUĂNG</div>
+        <div class="ui-label" data-lang="cast_label">LỰC QUĂNG</div>
         <div id="cast-bar-wrap"><div id="cast-bar"></div></div>
-        <div class="ui-hint">Thả [Q] để quăng</div>
+        <div class="ui-hint" data-lang="cast_hint">Thả [Q] để quăng</div>
     </div>
 
     <!-- Crosshair -->
     <div id="crosshair">+</div>
 
     <!-- Bite alert -->
-    <div id="bite-alert" class="hidden">🐟 CÁ CẮN! Nhấn [Q] ngay!</div>
+    <div id="bite-alert" class="hidden" data-lang="bite_alert">🐟 CÁ CẮN! Nhấn [Q] ngay!</div>
 
     <!-- Message overlay -->
     <div id="message-overlay"></div>
 
-    <!-- Controls hint (bottom left) -->
-    <div id="controls-hint">
-        WASD · Chuột · Q: Câu/Kéo · C: Cúi · Shift: Chạy · F: Nấp · ESC: Kết thúc đêm
+    <!-- Controls hint (bottom center) -->
+    <div id="controls-hint" data-lang="controls_hint">
+        WASD · Chuột · Q: Câu/Kéo · C: Cúi · Shift: Chạy · F: Nấp · ESC: Kết thúc
     </div>
 
     <!-- ===== SCREENS ===== -->
 
     <!-- Main Menu -->
     <div id="screen-menu" class="screen">
-        <h1>🎣 CÁ TRỘM</h1>
-        <h2>ĐÊM KHÔNG NGỦ</h2>
+        <h1 data-lang="menu_title">CÁ TRỘM</h1>
+        <h2 data-lang="menu_subtitle">ĐÊM KHÔNG NGỦ</h2>
         <div class="screen-divider"></div>
-        <p>Đột nhập vào hồ cấm · Câu cá quý · Tránh quản lý</p>
+        <p data-lang="menu_tagline">Đột nhập vào hồ cấm · Câu cá quý · Tránh quản lý</p>
         <br>
-        <p style="color:#88aa88;font-size:13px">WASD di chuyển · Q quăng cần · SPACE kéo cá · C cúi · F nấp vào bụi</p>
+        <p style="color:#88aa88;font-size:12px" data-lang="menu_controls">
+            WASD di chuyển · Q quăng cần · SPACE kéo cá · C cúi · F nấp vào bụi
+        </p>
         <br>
-        <button id="btn-start">▶ Bắt Đầu Đêm Nay</button>
+        <button id="btn-start" data-lang="btn_start">▶ Bắt Đầu Đêm Nay</button>
     </div>
 
     <!-- Caught -->
     <div id="screen-caught" class="screen hidden">
-        <h2>🚨 BỊ BẮT! 🚨</h2>
-        <p>Quản lý đã tóm được bạn!</p>
+        <h2 data-lang="caught_title">🚨 BỊ BẮT! 🚨</h2>
+        <p data-lang="caught_sub">Quản lý đã tóm được bạn!</p>
         <p id="caught-fine-msg" style="color:#ff8888;margin-top:12px"></p>
-        <button id="btn-retry" style="margin-top:20px">↺ Thử Lại</button>
+        <button id="btn-retry" data-lang="btn_retry">↺ Thử Lại</button>
     </div>
 
     <!-- Night Complete -->
     <div id="screen-complete" class="screen hidden">
-        <h2>🌅 Đêm Kết Thúc!</h2>
+        <h2 data-lang="complete_title">🌅 Đêm Kết Thúc!</h2>
         <div id="earnings-list"></div>
         <p id="earnings-total" style="color:#ffd700;font-size:18px;margin-top:12px"></p>
-        <button id="btn-shop">🏪 Vào Cửa Hàng</button>
+        <button id="btn-shop" data-lang="btn_shop">🏪 Vào Cửa Hàng</button>
     </div>
 
     <!-- Shop -->
     <div id="screen-shop" class="screen hidden">
-        <h2>🏪 Cửa Hàng Đen</h2>
-        <p>Tiền: <span id="shop-money" style="color:#ffd700">500</span>g</p>
+        <h2 data-lang="shop_title">🏪 Cửa Hàng Đen</h2>
+        <p><span data-lang="shop_money_label">Tiền:</span> <span id="shop-money" style="color:#ffd700">500</span>g</p>
         <div id="shop-grid"></div>
-        <button id="btn-new-night" style="margin-top:16px">🌙 Ra Đi Đêm Mới</button>
+        <button id="btn-new-night" data-lang="btn_new_night">🌙 Ra Đi Đêm Mới</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/lang.js"></script>
     <script src="js/state.js"></script>
     <script src="js/fish-data.js"></script>
     <script src="js/world.js"></script>

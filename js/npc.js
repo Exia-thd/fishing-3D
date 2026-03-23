@@ -67,13 +67,26 @@ class Guard {
     _buildMesh(scene) {
         const g = new THREE.Group();
 
-        // Body
-        const body = new THREE.Mesh(
-            new THREE.CapsuleGeometry(0.28, 1.0, 4, 8),
+        // Body (CylinderGeometry used — CapsuleGeometry not in r128)
+        const torso = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.26, 0.28, 1.0, 8),
             new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
         );
-        body.position.y = 0.82;
-        g.add(body);
+        torso.position.y = 0.82;
+        g.add(torso);
+        // Shoulder rounding
+        const shoulder = new THREE.Mesh(
+            new THREE.SphereGeometry(0.27, 8, 6),
+            new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
+        );
+        shoulder.position.y = 1.32;
+        g.add(shoulder);
+        const hip = new THREE.Mesh(
+            new THREE.SphereGeometry(0.27, 8, 6),
+            new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
+        );
+        hip.position.y = 0.32;
+        g.add(hip);
 
         // Head
         const head = new THREE.Mesh(
