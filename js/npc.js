@@ -66,59 +66,165 @@ class Guard {
 
     _buildMesh(scene) {
         const g = new THREE.Group();
+        const M = (color, flat) => flat
+            ? new THREE.MeshBasicMaterial({ color })
+            : new THREE.MeshLambertMaterial({ color });
 
-        // Body (CylinderGeometry used — CapsuleGeometry not in r128)
-        const torso = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.26, 0.28, 1.0, 8),
-            new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
-        );
-        torso.position.y = 0.82;
-        g.add(torso);
-        // Shoulder rounding
-        const shoulder = new THREE.Mesh(
-            new THREE.SphereGeometry(0.27, 8, 6),
-            new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
-        );
-        shoulder.position.y = 1.32;
-        g.add(shoulder);
-        const hip = new THREE.Mesh(
-            new THREE.SphereGeometry(0.27, 8, 6),
-            new THREE.MeshLambertMaterial({ color: 0x2d3d4e })
-        );
-        hip.position.y = 0.32;
-        g.add(hip);
+        // ── Palette ───────────────────────────────────────────────────
+        const SKIN    = 0xc8845a;
+        const UNIFORM = 0x2e4a2e;  // dark green jacket
+        const PANTS   = 0x1e3018;  // darker pants
+        const BOOT    = 0x16120a;  // near-black boots
+        const BELT    = 0x3a2810;  // dark brown belt
+        const CAP     = 0x141f14;  // dark cap
+        const HAIR    = 0x160e06;
 
-        // Head
-        const head = new THREE.Mesh(
-            new THREE.SphereGeometry(0.2, 8, 8),
-            new THREE.MeshLambertMaterial({ color: 0xcc9966 })
-        );
-        head.position.y = 1.88;
-        g.add(head);
+        // ── Helper ────────────────────────────────────────────────────
+        const cyl  = (rt, rb, h, seg, col) => new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), M(col));
+        const sph  = (r, ws, hs, col)      => new THREE.Mesh(new THREE.SphereGeometry(r, ws, hs), M(col));
+        const box  = (w, h, d, col)        => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(col));
 
-        // Cap
-        const cap = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.22, 0.24, 0.18, 8),
-            new THREE.MeshLambertMaterial({ color: 0x1a2a1a })
-        );
-        cap.position.y = 2.04;
-        g.add(cap);
+        const add = (mesh, x, y, z, sx, sy, sz) => {
+            mesh.position.set(x, y, z);
+            if (sx !== undefined) mesh.scale.set(sx, sy, sz);
+            g.add(mesh); return mesh;
+        };
 
-        // Flashlight prop
+        // ── Boots ─────────────────────────────────────────────────────
+        for (const s of [-1, 1]) {
+            const ox = s * 0.105;
+            add(box(0.17, 0.13, 0.30, BOOT), ox, 0.065, 0.02);      // sole+upper
+            add(cyl(0.085, 0.092, 0.14, 8, BOOT), ox, 0.19, 0);     // ankle
+        }
+
+        // ── Legs ──────────────────────────────────────────────────────
+        for (const s of [-1, 1]) {
+            const ox = s * 0.105;
+            add(cyl(0.082, 0.090, 0.38, 8, PANTS), ox, 0.46, 0);    // shin
+            add(sph(0.092, 8, 7, PANTS), ox, 0.655, 0);              // knee
+            add(cyl(0.110, 0.088, 0.36, 8, PANTS), ox, 0.84, 0);    // thigh
+        }
+
+        // ── Hips / waist ──────────────────────────────────────────────
+        add(cyl(0.215, 0.200, 0.20, 9, PANTS),   0, 1.03, 0);
+        add(cyl(0.220, 0.215, 0.055, 9, BELT),   0, 1.145, 0);      // belt
+        // Belt buckle
+        add(box(0.07, 0.05, 0.04, 0xbbaa55),     0, 1.145, -0.22);
+
+        // ── Torso ─────────────────────────────────────────────────────
+        add(cyl(0.235, 0.218, 0.50, 9, UNIFORM), 0, 1.40, 0);       // abdomen→chest
+        // Chest bulge
+        const chest = sph(0.245, 9, 7, UNIFORM);
+        chest.scale.set(1, 0.62, 0.88);
+        add(chest, 0, 1.60, 0);
+
+        // Jacket details — centre seam
+        add(box(0.025, 0.46, 0.02, 0x263d26), 0, 1.40, -0.235);
+
+        // ── Shoulders & Arms ──────────────────────────────────────────
+        for (const s of [-1, 1]) {
+            const ox = s * 0.29;
+
+            // Epaulet
+            add(box(0.13, 0.055, 0.15, UNIFORM), ox, 1.68, 0);
+
+            // Shoulder cap
+            const shCap = sph(0.135, 8, 7, UNIFORM);
+            shCap.scale.set(1, 0.80, 1);
+            add(shCap, ox, 1.665, 0);
+
+            // Upper arm
+            add(cyl(0.082, 0.075, 0.36, 8, UNIFORM), ox, 1.46, 0);
+
+            // Elbow
+            add(sph(0.078, 7, 6, UNIFORM), ox, 1.27, 0);
+
+            // Forearm (slight angle forward)
+            const fa = cyl(0.068, 0.062, 0.33, 8, UNIFORM);
+            fa.rotation.x = s * 0.07;
+            add(fa, ox, 1.09, s * 0.02);
+
+            // Hand
+            const hand = sph(0.072, 8, 7, SKIN);
+            hand.scale.set(0.85, 0.90, 1.05);
+            add(hand, ox, 0.90, 0);
+
+            // Fingers hint (flattened box)
+            add(box(0.10, 0.045, 0.08, SKIN), ox, 0.858, -0.02);
+        }
+
+        // ── Neck ──────────────────────────────────────────────────────
+        add(cyl(0.088, 0.098, 0.17, 8, SKIN), 0, 1.775, 0);
+
+        // ── Head ──────────────────────────────────────────────────────
+        const skull = sph(0.185, 12, 10, SKIN);
+        skull.scale.set(1, 1.05, 0.92);
+        add(skull, 0, 1.965, 0);
+
+        // Jaw / lower face (slightly wider, lower)
+        const jaw = sph(0.155, 10, 8, SKIN);
+        jaw.scale.set(0.98, 0.62, 0.88);
+        add(jaw, 0, 1.865, 0.045);
+
+        // Ears
+        for (const s of [-1, 1]) {
+            const ear = sph(0.048, 6, 5, SKIN);
+            ear.scale.set(0.45, 0.75, 0.9);
+            add(ear, s * 0.185, 1.965, 0);
+        }
+
+        // Eyes (white + pupil)
+        for (const s of [-1, 1]) {
+            const eyeW = sph(0.030, 7, 6, 0xffffff);
+            add(eyeW, s * 0.068, 1.975, 0.168);
+            const pupil = sph(0.018, 6, 5, 0x111111, true);
+            add(pupil, s * 0.068, 1.973, 0.185);
+        }
+
+        // Eyebrows
+        for (const s of [-1, 1]) {
+            add(box(0.065, 0.018, 0.018, HAIR), s * 0.068, 2.005, 0.165);
+        }
+
+        // Nose
+        const nose = sph(0.030, 6, 5, 0xb87050);
+        nose.scale.set(0.7, 0.8, 1);
+        add(nose, 0, 1.938, 0.188);
+
+        // Mouth
+        add(box(0.068, 0.015, 0.016, 0x8a4a3a), 0, 1.900, 0.182);
+
+        // ── Hair (short under cap) ────────────────────────────────────
+        const hairMesh = sph(0.175, 10, 8, HAIR);
+        hairMesh.scale.set(1.04, 0.72, 1.0);
+        add(hairMesh, 0, 2.025, 0.02);
+
+        // ── Military cap ──────────────────────────────────────────────
+        add(cyl(0.190, 0.205, 0.155, 9, CAP), 0, 2.10, 0);          // crown
+        // Brim (angled forward)
+        const brim = box(0.38, 0.028, 0.18, CAP);
+        brim.rotation.x = 0.18;
+        add(brim, 0, 1.990, -0.11);
+        // Cap top button
+        add(cyl(0.022, 0.022, 0.025, 6, 0x4a6a4a), 0, 2.182, 0);
+
+        // ── Flashlight prop (right hand) ──────────────────────────────
         const fl = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.04, 0.05, 0.28, 7),
-            new THREE.MeshLambertMaterial({ color: 0x888888 })
+            new THREE.CylinderGeometry(0.038, 0.048, 0.26, 8),
+            new THREE.MeshLambertMaterial({ color: 0x777777 })
         );
-        fl.position.set(0.32, 1.6, -0.18);
-        fl.rotation.x = Math.PI / 2.2;
+        fl.position.set(0.30, 1.55, -0.22);
+        fl.rotation.x = Math.PI / 2.1;
         g.add(fl);
+        // Lens
+        add(cyl(0.042, 0.042, 0.022, 8, 0xddddff), 0.30, 1.55, -0.35);
 
-        // Alert indicator (bubble above head)
+        // ── Alert bubble ──────────────────────────────────────────────
         this.alertBubble = new THREE.Mesh(
             new THREE.SphereGeometry(0.12, 6, 6),
             new THREE.MeshBasicMaterial({ color: 0x00ff00 })
         );
-        this.alertBubble.position.y = 2.5;
+        this.alertBubble.position.y = 2.55;
         g.add(this.alertBubble);
 
         this.mesh = g;
