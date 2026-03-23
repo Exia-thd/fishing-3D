@@ -22,12 +22,16 @@ class NPCSystem {
             maxAlert = Math.max(maxAlert, npc.alertContrib);
         }
 
-        // Smooth global alert
-        const target = maxAlert;
-        GameState.alertLevel += (target - GameState.alertLevel) * 0.06;
-        GameState.alertLevel = Math.max(0, Math.min(100, GameState.alertLevel));
+        // If any guard fully alerted → caught immediately
+        if (maxAlert >= 100) {
+            GameState.alertLevel = 100;
+            return true;
+        }
 
-        return GameState.alertLevel >= 100; // caught!
+        // Smooth global alert bar toward current max
+        GameState.alertLevel += (maxAlert - GameState.alertLevel) * 0.06;
+        GameState.alertLevel = Math.max(0, Math.min(99.9, GameState.alertLevel));
+        return false;
     }
 
     getFlashlightData() {
