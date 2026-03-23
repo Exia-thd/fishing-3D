@@ -150,7 +150,7 @@ class FishingSystem {
                 this.biteWindow -= dt;
                 if (qDown && !this._prevQ) { /* handled by onQPress */ }
                 if (this.biteWindow <= 0) {
-                    this._fishEscape('Cá sổng mất rồi!');
+                    this._fishEscape(Lang.t('fish_miss'));
                 }
                 break;
 
@@ -196,7 +196,7 @@ class FishingSystem {
         const d = this.currentFish.biteDelay;
         this.biteTimer = d[0] + Math.random() * (d[1] - d[0]);
 
-        UI.showMessage('Đã quăng cần. Chờ cá cắn...', 2, '#aaffaa');
+        UI.showMessage(Lang.t('cast_waiting'), 2, '#aaffaa');
     }
 
     _startReel() {
@@ -233,9 +233,9 @@ class FishingSystem {
         }
 
         if (this.tension < 5) {
-            this._fishEscape('Dây lỏng quá, cá trốn!');
+            this._fishEscape(Lang.t('fish_escape_loose'));
         } else if (this.tension > 95) {
-            this._fishEscape('Đứt dây rồi!');
+            this._fishEscape(Lang.t('fish_escape_break'));
         } else if (this.reelProgress >= 100) {
             this._catchFish();
         }
