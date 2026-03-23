@@ -142,12 +142,12 @@ class World {
         const g = new THREE.Group();
         const h = 4 + Math.random() * 5;
         // Trunk
-        g.add(Object.assign(
-            new THREE.Mesh(
-                new THREE.CylinderGeometry(0.18, 0.32, h * 0.4, 6),
-                new THREE.MeshLambertMaterial({ color: 0x3c2810 })
-            ), { position: new THREE.Vector3(0, h * 0.2, 0) }
-        ));
+        const trunk = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.32, h * 0.4, 6),
+            new THREE.MeshLambertMaterial({ color: 0x3c2810 })
+        );
+        trunk.position.set(0, h * 0.2, 0);
+        g.add(trunk);
         // Foliage cones
         const cols = [0x1a3a0e, 0x1f4412, 0x163a0a];
         for (let i = 0; i < 3; i++) {
